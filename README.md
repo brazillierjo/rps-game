@@ -23,4 +23,18 @@ pnpm build     # construire l'app pour la prod
 4. **Résultat & scoreboard** : la résolution de manche met à jour l’état, affiche un résumé clair et incrémente le scoreboard (victoires, égalités, rounds).
 5. **UI responsive** : l’application reste utilisable sur mobile/tablette avec une sidebar compacte, des cartes adaptées et des boutons accessibles.
 
+## Stack
+
+- **Next.js 16** (App Router, TypeScript strict)
+- **SCSS modules** pour le styling
+- **Framer Motion** pour les animations (boutons de coups, scoreboard, résultats)
+- **Radix Icons** pour l’iconographie légère
+
+## Pistes d’amélioration
+
+1. Sidebar mobile repliable (dropdown) pour afficher directement la zone de jeu.
+2. Historique des rounds (log des coups, temps, gagnants).
+3. Auto-play CPU vs CPU en continu avec contrôle de vitesse.
+4. Persistance des scores (localStorage) pour retrouver sa session.
+
 Bonne partie !***
