@@ -1,14 +1,18 @@
-import { ButtonHTMLAttributes } from 'react';
+import { ButtonHTMLAttributes, forwardRef } from 'react';
 import styles from './button.module.scss';
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: 'primary' | 'ghost';
+  variant?: 'primary' | 'ghost' | 'secondary' | 'outline';
 };
 
 const cx = (...classes: Array<string | undefined>) => classes.filter(Boolean).join(' ');
 
-export const Button = ({ className, children, variant = 'primary', ...props }: ButtonProps) => (
-  <button className={cx(styles.button, styles[variant], className)} {...props}>
-    {children}
-  </button>
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, children, variant = 'primary', ...props }, ref) => (
+    <button ref={ref} className={cx(styles.button, styles[variant], className)} {...props}>
+      {children}
+    </button>
+  ),
 );
+
+Button.displayName = 'Button';

@@ -5,13 +5,41 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
-import { Move, PlayerSlot, RoundMoves, RoundResult, Scoreboard } from '@/lib/game/types';
-import { applyRoundToScoreboard, createInitialScoreboard, resolveRound } from '@/lib/game/engine';
+import {
+  GameMode,
+  Move,
+  PlayerNames,
+  PlayerSlot,
+  PlayersMap,
+  RoundMoves,
+  RoundResult,
+  Scoreboard,
+  PLAYER_SLOTS,
+} from '@/lib/game/types';
+import {
+  applyRoundToScoreboard,
+  createInitialScoreboard,
+  createPlayersForMode,
+  getRandomMove,
+  resolveRound,
+} from '@/lib/game/engine';
 
 type RoundSelections = Partial<RoundMoves>;
+
+const deriveInitialPlayer = (mode: GameMode, names: PlayerNames): PlayerSlot | null => {
+  if (mode === 'COMPUTER_VS_COMPUTER') {
+    return null;
+  }
+  const derivedPlayers = createPlayersForMode(mode, names);
+  if (derivedPlayers.playerOne.kind === 'human') return 'playerOne';
+  if (derivedPlayers.playerTwo.kind === 'human') return 'playerTwo';
+  return null;
+};
 
 export interface RoundSelectionContextValue {
   selections: RoundSelections;
@@ -21,65 +49,176 @@ export interface RoundSelectionContextValue {
   resetRound: () => void;
   lastResult: RoundResult | null;
   scoreboard: Scoreboard;
+  gameMode: GameMode;
+  setGameMode: (mode: GameMode) => void;
+  players: PlayersMap;
+  updatePlayerName: (slot: PlayerSlot, name: string) => void;
+  autoPlayRound: () => void;
 }
 
 const RoundSelectionContext = createContext<RoundSelectionContextValue | null>(null);
 
 export const RoundSelectionProvider = ({ children }: PropsWithChildren) => {
-  const [currentPlayer, setCurrentPlayer] = useState<PlayerSlot | null>('playerOne');
+  const [gameMode, setGameModeState] = useState<GameMode>('PLAYER_VS_PLAYER');
+  const [playerNames, setPlayerNames] = useState<PlayerNames>({
+    playerOne: 'Player 1',
+    playerTwo: 'Player 2',
+  });
   const [selections, setSelections] = useState<RoundSelections>({});
+  const [currentPlayer, setCurrentPlayer] = useState<PlayerSlot | null>(() =>
+    deriveInitialPlayer(gameMode, playerNames),
+  );
   const [lastResult, setLastResult] = useState<RoundResult | null>(null);
   const [scoreboard, setScoreboard] = useState<Scoreboard>(() => createInitialScoreboard());
 
-  const finalizeRound = useCallback((moves: RoundMoves) => {
-    const result = resolveRound(moves);
+  const playerNamesRef = useRef<PlayerNames>({
+    playerOne: 'Player 1',
+    playerTwo: 'Player 2',
+  });
 
-    setLastResult(result);
-    setScoreboard((prev) => applyRoundToScoreboard(prev, result.winner));
+  useEffect(() => {
+    playerNamesRef.current = playerNames;
+  }, [playerNames]);
+
+  const players = useMemo(
+    () => createPlayersForMode(gameMode, playerNames),
+    [gameMode, playerNames],
+  );
+
+  const selectionsRef = useRef<RoundSelections>({});
+
+  useEffect(() => {
+    selectionsRef.current = selections;
+  }, [selections]);
+
+  const hardResetRound = useCallback(() => {
+    setSelections({});
+    selectionsRef.current = {};
+    setLastResult(null);
+    setCurrentPlayer(deriveInitialPlayer(gameMode, playerNamesRef.current));
+  }, [gameMode]);
+
+  const changeGameMode = useCallback((mode: GameMode) => {
+    setGameModeState(mode);
+    setScoreboard(createInitialScoreboard());
+    selectionsRef.current = {};
+    setSelections({});
+    setLastResult(null);
+    setCurrentPlayer(deriveInitialPlayer(mode, playerNamesRef.current));
   }, []);
+
+  const commitSelection = useCallback(
+    (slot: PlayerSlot, move: Move, base?: RoundSelections) => {
+      const reference = base ?? selectionsRef.current;
+      if (reference[slot] === move) return reference;
+
+      const nextSelections: RoundSelections = {
+        ...reference,
+        [slot]: move,
+      };
+
+      selectionsRef.current = nextSelections;
+      setSelections(nextSelections);
+
+      const ready = Boolean(nextSelections.playerOne && nextSelections.playerTwo);
+
+      if (ready) {
+        const round = nextSelections as RoundMoves;
+        const result = resolveRound(round);
+        setLastResult(result);
+        setScoreboard((prev) => applyRoundToScoreboard(prev, result.winner));
+        setCurrentPlayer(null);
+      } else if (gameMode !== 'COMPUTER_VS_COMPUTER') {
+        const nextActor = PLAYER_SLOTS.find((candidate) => !nextSelections[candidate]) ?? null;
+        setCurrentPlayer(nextActor ?? null);
+      }
+
+      return nextSelections;
+    },
+    [gameMode],
+  );
 
   const selectMove = useCallback(
     (move: Move) => {
-      if (!currentPlayer) {
-        return;
-      }
+      if (!currentPlayer) return;
 
-      if (selections[currentPlayer] === move) return;
+      const actor = players[currentPlayer];
 
-      const nextSelections: RoundSelections = {
-        ...selections,
-        [currentPlayer]: move,
-      };
+      if (actor.kind !== 'human') return;
+      if (!actor.name.trim()) return;
 
-      const roundReady = Boolean(nextSelections.playerOne && nextSelections.playerTwo);
-
-      setSelections(nextSelections);
-
-      if (roundReady) {
-        finalizeRound(nextSelections as RoundMoves);
-        setCurrentPlayer(null);
-      } else setCurrentPlayer(currentPlayer === 'playerOne' ? 'playerTwo' : 'playerOne');
+      commitSelection(currentPlayer, move);
     },
-    [currentPlayer, finalizeRound, selections],
+    [commitSelection, currentPlayer, players],
   );
 
-  const resetRound = useCallback(() => {
-    setSelections({});
-    setCurrentPlayer('playerOne');
-    setLastResult(null);
+  const updatePlayerName = useCallback((slot: PlayerSlot, name: string) => {
+    setPlayerNames((prev) => ({
+      ...prev,
+      [slot]: name,
+    }));
   }, []);
+
+  const resetRound = useCallback(() => {
+    hardResetRound();
+  }, [hardResetRound]);
+
+  const autoPlayRound = useCallback(() => {
+    if (gameMode !== 'COMPUTER_VS_COMPUTER') return;
+    if (selectionsRef.current.playerOne && selectionsRef.current.playerTwo) return;
+
+    let workingSelections = selectionsRef.current;
+    PLAYER_SLOTS.forEach((slot) => {
+      workingSelections = commitSelection(slot, getRandomMove(), workingSelections);
+    });
+  }, [commitSelection, gameMode]);
+
+  useEffect(() => {
+    if (!currentPlayer) return;
+    if (gameMode === 'COMPUTER_VS_COMPUTER') return;
+
+    const actor = players[currentPlayer];
+
+    if (actor.kind !== 'computer') return;
+
+    const timeout = setTimeout(() => {
+      commitSelection(currentPlayer, getRandomMove());
+    }, 650);
+
+    return () => clearTimeout(timeout);
+  }, [commitSelection, currentPlayer, gameMode, players]);
+
+  const isRoundComplete = Boolean(selections.playerOne && selections.playerTwo);
 
   const value = useMemo<RoundSelectionContextValue>(
     () => ({
       selections,
       currentPlayer,
-      isRoundComplete: Boolean(selections.playerOne && selections.playerTwo),
+      isRoundComplete,
       selectMove,
       resetRound,
       lastResult,
       scoreboard,
+      gameMode,
+      setGameMode: changeGameMode,
+      players,
+      updatePlayerName,
+      autoPlayRound,
     }),
-    [currentPlayer, selections, selectMove, resetRound, lastResult, scoreboard],
+    [
+      autoPlayRound,
+      currentPlayer,
+      gameMode,
+      isRoundComplete,
+      lastResult,
+      players,
+      resetRound,
+      scoreboard,
+      selectMove,
+      selections,
+      updatePlayerName,
+      changeGameMode,
+    ],
   );
 
   return <RoundSelectionContext.Provider value={value}>{children}</RoundSelectionContext.Provider>;

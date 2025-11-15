@@ -1,20 +1,21 @@
 .placeholder,
 .result {
   width: 100%;
-  border-radius: 1rem;
-  background: rgba(15, 23, 42, 0.55);
-  border: 1px solid rgba(148, 163, 184, 0.3);
-  padding: 1.25rem 1.5rem;
-  color: #e2e8f0;
-  min-height: 120px;
+  border-radius: 1.25rem;
+  background: linear-gradient(145deg, #ffffff, #fff7ed);
+  border: 2px solid rgba(249, 115, 22, 0.15);
+  padding: 1.35rem 1.5rem;
+  color: #064e3b;
+  min-height: 130px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  box-shadow: 0 12px 28px rgba(15, 118, 110, 0.12);
 }
 
 .placeholder {
-  color: rgba(226, 232, 240, 0.8);
+  color: rgba(6, 78, 59, 0.7);
   font-style: italic;
 }
 
@@ -24,14 +25,14 @@
 
 .title {
   margin: 0;
-  font-size: 1.2rem;
-  font-weight: 700;
+  font-size: 1.3rem;
+  font-weight: 800;
 }
 
 .description {
-  margin: 0.2rem 0 0;
-  color: rgba(226, 232, 240, 0.9);
-  font-size: 0.95rem;
+  margin: 0.35rem 0 0;
+  color: rgba(55, 65, 81, 0.8);
+  font-size: 1rem;
 }
 
 @media (max-width: 640px) {
