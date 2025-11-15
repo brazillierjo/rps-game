@@ -1,0 +1,35 @@
+.placeholder,
+.result {
+  width: 100%;
+  border-radius: 1rem;
+  background: rgba(15, 23, 42, 0.55);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  padding: 1.25rem 1.5rem;
+  color: #e2e8f0;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.placeholder {
+  color: rgba(226, 232, 240, 0.8);
+  font-style: italic;
+}
+
+.result {
+  flex-wrap: wrap;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.description {
+  margin: 0.2rem 0 0;
+  color: rgba(226, 232, 240, 0.9);
+  font-size: 0.95rem;
+}

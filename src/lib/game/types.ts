@@ -11,3 +11,19 @@ export const MOVE_LABELS: Record<Move, string> = {
 export type PlayerSlot = 'playerOne' | 'playerTwo';
 
 export type RoundMoves = Record<PlayerSlot, Move>;
+
+export type RoundOutcome = PlayerSlot | 'draw';
+
+export interface RoundResult {
+  moves: RoundMoves;
+  winner: RoundOutcome;
+  winningMove: Move | null;
+  losingMove: Move | null;
+}
+
+export interface Scoreboard {
+  playerOne: number;
+  playerTwo: number;
+  draws: number;
+  rounds: number;
+}
