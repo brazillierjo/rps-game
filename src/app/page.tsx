@@ -1,7 +1,7 @@
 import { MoveChoices } from '@/components/game/MoveChoices';
 import { RoundResult } from '@/components/game/RoundResult';
+import { PlayerStatus } from '@/components/game/PlayerStatus';
 import { Scoreboard } from '@/components/game/Scoreboard';
-import { Button } from '@/components/ui/button/Button';
 import { RoundSelectionProvider } from '@/contexts/RoundSelectionContext';
 import styles from './page.module.scss';
 
@@ -10,11 +10,10 @@ export default function Home() {
     <RoundSelectionProvider>
       <main className={styles.main}>
         <aside className={styles.controls}>
-          <div className={styles.playerButtons}>
-            <Button type="button">Player 1</Button>
-            <Button type="button">Player 2</Button>
+          <div className={styles.playerStatusList}>
+            <PlayerStatus slot="playerOne" />
+            <PlayerStatus slot="playerTwo" />
           </div>
-
           <Scoreboard />
         </aside>
 
