@@ -71,3 +71,18 @@
   border-color: rgba(14, 165, 233, 0.8);
   box-shadow: 0 10px 25px rgba(14, 165, 233, 0.2);
 }
+
+@media (max-width: 640px) {
+  .wrapper {
+    width: 100%;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .moveButton {
+    min-height: 120px;
+    padding: 1rem;
+  }
+}

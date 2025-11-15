@@ -33,3 +33,15 @@
   color: rgba(226, 232, 240, 0.9);
   font-size: 0.95rem;
 }
+
+@media (max-width: 640px) {
+  .result {
+    flex-direction: column;
+    align-items: flex-start;
+
+    button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}

@@ -54,3 +54,23 @@
 .value {
   font-variant-numeric: tabular-nums;
 }
+
+@media (max-width: 768px) {
+  .scoreboard {
+    padding: 1.25rem;
+  }
+
+  .header {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .scoreboard {
+    padding: 1rem;
+  }
+
+  .row {
+    font-size: 1rem;
+  }
+}
