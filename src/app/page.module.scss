@@ -1,6 +1,31 @@
-.h1 {
-  color: red;
-  font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
+.main {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: minmax(180px, 220px) 1fr;
+  min-height: 100vh;
+  padding: 2rem clamp(1rem, 3vw, 3rem);
+  background: #0f172a;
+  color: #f1f5f9;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background: rgba(15, 23, 42, 0.6);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.board {
+  border-radius: 1.5rem;
+  border: 2px dashed rgba(148, 163, 184, 0.4);
+  background: rgba(15, 23, 42, 0.4);
+}
+
+@media (max-width: 768px) {
+  .main {
+    grid-template-columns: 1fr;
+  }
 }
