@@ -1,36 +1,26 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Rock, Paper, Scissors – Next.js + TS + SCSS
 
-## Getting Started
-
-First, run the development server:
+## Commandes
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install   # installer les dépendances
+pnpm dev       # lancer le mode développement (localhost:3000)
+pnpm build     # construire l'app pour la prod
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+(Le jeu est également disponible en ligne : https://rps-game-tau-five.vercel.app)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Temps passé
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- 1 h 40 pour l’implémentation complète du scope principal (PvP, scoreboard, responsive).
+- 1 h 30 supplémentaires pour les bonus (UI, noms personnalisés, modes CPU, animations).
 
-## Learn More
+## Fonctionnement
 
-To learn more about Next.js, take a look at the following resources:
+1. **Modes de jeu** : choisir entre Player vs Player, Player vs Computer ou Computer vs Computer. Les messages s’adaptent automatiquement et la version bot vs bot dispose d’un bouton “Play round”.
+2. **Joueurs** : chaque carte affiche le statut (actif, prêt, en attente) et permet de renommer le joueur humain. Un nom vide bloque la sélection d’un coup pour éviter les erreurs.
+3. **Sélection des coups** : les moves sont animés (Framer Motion) et mettent en évidence qui a choisi quoi. Les bots jouent automatiquement avec de légers délais pour rester lisibles.
+4. **Résultat & scoreboard** : la résolution de manche met à jour l’état, affiche un résumé clair et incrémente le scoreboard (victoires, égalités, rounds).
+5. **UI responsive** : l’application reste utilisable sur mobile/tablette avec une sidebar compacte, des cartes adaptées et des boutons accessibles.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Bonne partie !***
